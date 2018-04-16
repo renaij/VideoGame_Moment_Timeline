@@ -23,13 +23,13 @@ var updateSprites = function(number){
     var scaleMultiplier = 200.0;
     var group = new THREE.Group();
     var totalMap = textureLoader.load('./spritesheet0.png');
+
+
     var jsonFile = new THREE.FileLoader().load('./spritesheet0.png.json',function(data){
       var jsonObj = JSON.parse(data);
       number = jsonObj.totalCount;
       var fileNameLength = 9;
       for (var i = 0; i < number; i++){
-        var spriteMaterial = new THREE.SpriteMaterial( { map: totalMap, color: 0xffffff} );
-
         //var filename = i + '.png';
         //filename = '0'.repeat(fileNameLength - filename.length) + filename;
         //var spriteMap = textureLoader.load('./pic/thumbnails/' + filename);
@@ -52,16 +52,20 @@ var updateSprites = function(number){
           uvHeight: jsonObj[i].uvRepeat_v
         }
 
-        spriteMaterial.offset.x = momentObj.uvOffset_u;
-        spriteMaterial.offset.y = momentObj.uvOffset_v;
-        spriteMaterial.repeat.x = momentObj.uvWidth;
-        spriteMaterial.repeat.y = momentObj.uvHeight;
+        //Made some modification in Three.js, adding additional params in Sprite
+        var params = {uvOffset: {u: momentObj.uvOffset_u, v: momentObj.uvOffset_v},
+                      uvRepeat: {u: momentObj.uvWidth, v:momentObj.uvHeight}};
+        var spriteMaterial = new THREE.SpriteMaterial( { map: totalMap, color: 0xffffff} );
 
-        var sprite = new THREE.Sprite( spriteMaterial );
+        var sprite = new THREE.Sprite( spriteMaterial, params);
+
+        sprite.name = i.toString();
         sprite.position.set(position.x, position.y, position.z);
         sprite.scale.set( momentObj.width, momentObj.height, 1.0 );
-        group.add( sprite );
+        //group.add( sprite );
+        scene.add(sprite);
+        interactionObjects.push(sprite);
       }
-      scene.add(group);
+      // scene.add(group);
     });
 };

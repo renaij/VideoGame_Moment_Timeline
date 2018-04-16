@@ -18505,12 +18505,12 @@
 
 				if ( material.map !== null ) {
 					// DEBUGGING: CHANGED
-					if (material.offset == undefined && material.repeat == undefined) {
+					if (sprite.uvOffset == undefined && sprite.uvRepeat == undefined) {
 						gl.uniform2f( uniforms.uvOffset, material.map.offset.x, material.map.offset.y );
 					  gl.uniform2f( uniforms.uvScale, material.map.repeat.x, material.map.repeat.y );
 					} else {
-						gl.uniform2f( uniforms.uvOffset, material.offset.x, material.offset.y );
-						gl.uniform2f( uniforms.uvScale, material.repeat.x, material.repeat.y );
+						gl.uniform2f( uniforms.uvOffset, sprite.uvOffset.u, sprite.uvOffset.v );
+						gl.uniform2f( uniforms.uvScale, sprite.uvRepeat.u, sprite.uvRepeat.v );
 					}
 
 				} else {
@@ -23880,7 +23880,7 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	function Sprite( material ) {
+	function Sprite( material, parameters) {
 
 		Object3D.call( this );
 
@@ -23890,6 +23890,11 @@
 
 		this.center = new Vector2( 0.5, 0.5 );
 
+		// DEBUGGING: we're assuming if used, offset and repeat (x/y) will be there
+		if (parameters != undefined) {
+			this.uvOffset = parameters.uvOffset;
+			this.uvRepeat = parameters.uvRepeat;
+		}
 	}
 
 	Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
