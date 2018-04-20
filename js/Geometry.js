@@ -1,4 +1,4 @@
-var totalMap = textureLoader.load('./spritesheet0.png');
+var totalMap = textureLoader.load('./pic/spritesheet0.png');
 
 var addMoment = function(momentObj,jsonObj){
   var geometry = new THREE.Geometry();
@@ -55,16 +55,15 @@ var addMoment = function(momentObj,jsonObj){
   return mesh;
 }
 
-var updateMoments = function(number){
+var updateMoments = function(){
   var position;
   var momentObj;
   var fileNameLength = 9;
-  var scaleMultiplier = 200.0;
   var material = new THREE.MeshBasicMaterial({
     map: totalMap
   });
 
-  var jsonFile = new THREE.FileLoader().load('./spritesheet0.png.json', function(data){
+  var jsonFile = new THREE.FileLoader().load('./pic/spritesheet0.png.json', function(data){
     var jsonObj = JSON.parse(data);
     number = jsonObj.totalCount;
     for (var i = 0; i < number; i++){

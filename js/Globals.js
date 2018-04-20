@@ -1,6 +1,10 @@
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
-var spaceScale = 10000;
-var imageSize = {width: 64, height:56};
-var imageNumber = 3000;
+var spaceScale = 10000.0;
+var scaleMultiplier = 100.0;
+var spriteSheetPath = './pic/spritesheet0.png';
+var spriteJSONPath = './pic/supermarioworld3_100.json';
+var adjacentMoments = 20;
+var autoRotateSpeed = 0.05;
+var fileLoader = new THREE.FileLoader();
 var textureLoader = new THREE.TextureLoader();
