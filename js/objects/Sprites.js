@@ -70,6 +70,7 @@
 var addSprites = function(){
     var position = {x: 0.0, y : 0.0, z: 0.0};
     var momentObj;
+    var anchor = new THREE.Vector2(0.5,0.5);
     var totalMap = textureLoader.load(spriteSheetPath);
     var jsonFile = fileLoader.load(spriteJSONPath,function(data){
       var jsonObj = JSON.parse(data);
@@ -100,6 +101,8 @@ var addSprites = function(){
              uvWidth: jsonObj[i].uvRepeat_u,
              uvHeight: jsonObj[i].uvRepeat_v
            }
+           imageWidth = jsonObj.spriteWidth;
+           imageHeight = jsonObj.spriteHeight;
            //Made some modification in Three.js, adding additional params in Sprite
            var params = {uvOffset: {u: momentObj.uvOffset_u, v: momentObj.uvOffset_v},
                          uvRepeat: {u: momentObj.uvWidth, v:momentObj.uvHeight}};
@@ -115,13 +118,19 @@ var addSprites = function(){
            } else {
              sprite.position.set(momentObj.position[0], momentObj.position[1], momentObj.position[2]);
            }
-           sprite.center = new THREE.Vector2(0.5,0.5);
+           sprite.center = anchor;
            sprite.material.transparent = true;
            sprite.material.opacity = 1;
-           spriteScale = momentObj.width/momentObj.height;
-           sprite.scale.set( spriteScale, 1.0, 1.0 );
+           sprite.scale.set( momentObj.width/momentObj.height, 1.0, 1.0 );
            spriteGroup.add( sprite );
-           spriteDictionary[i] = {object: sprite, image: jsonObj[i].filename};
+           spriteDictionary[i] = {
+             object: sprite,
+             image: jsonObj[i].filename,
+             label: 'Moment Index: ' + i.toString(),
+             game: game,
+             corpus: corpus,
+             labelSprite: null //reserved for metalabel shown when this sprite is clicked
+           };
          }
          interactionObjects.push(spriteGroup);
          scene.add(spriteGroup);
@@ -129,8 +138,3 @@ var addSprites = function(){
        }); //end of fileLoader.load
     }); //end of jsonFile.load
 };
-
-//load high-resolution texture when sprite is near the camera
-var updateSprites(){
-
-}

@@ -1,8 +1,6 @@
-// var WIDTH = window.innerWidth;
-// var HEIGHT = window.innerHeight;
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
-var spaceScale = 200.0;
+var spaceScale = 400.0;
 var scaleMultiplier = 10.0 ;//100.0;
 var flyingDuration = 1000;
 var FLY_STOP_DISTANCE = 2.0;

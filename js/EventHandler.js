@@ -1,22 +1,27 @@
 function onMouseClicked() {
   if (!isFlying) {
+
     // update the mouse position
   	mouse.x = ( event.clientX / window.innerWidth ) * 2.0 - 1.0;
   	mouse.y = - ( event.clientY / window.innerHeight ) * 2.0 + 1.0;
+
     raycaster.setFromCamera( mouse, camera );
     var intersects = raycaster.intersectObjects( interactionObjects, true );
 
     var points = [];
     resetMetaLabel();
-    resetMaterial();
+    resetSprite();
     resetLines();
+    currentTarget = 0;
 
     // if there is one (or more) intersections
   	if ( intersects.length > 0 )
   	{
-      //console.log("mouse.x=" + mouse.x.toString() + ";mouse.y=" + mouse.y.toString() );
+      controls.autoRotate = false;
+      console.log("clicked:" + intersects[0].object.name );
       lastSelected.object = intersects[0].object;
       var spriteId = Number(intersects[0].object.name);
+      currentTarget = spriteId;
       var totalNumber = Object.keys(spriteDictionary).length;
       var start = 0;
       start = spriteId - adjacentMoments;
@@ -38,17 +43,14 @@ function onMouseClicked() {
       //Draw lines between nearby moments:
       //lastSelected.line = drawLine(points);
 
-      momentLabel.name = 'Moment Index: ' + intersects[0].object.name;
-      momentLabel.game = game;
-      momentLabel.corpus = corpus;
-      generate_text(momentLabel,intersects[0].object);
-      lastSelected.object.scale.set(0.0, 0.0, 0.0);
-
       for (var n = 0; n < spriteGroup.children.length; n++)
       {
         if (Number(spriteGroup.children[n].name) < start || Number(spriteGroup.children[n].name) > stop)
         {
           spriteGroup.children[n].material.opacity = 0.1;
+        } else {
+          //Create detailed views and hide low-res views
+          generate_label(spriteDictionary[n]);
         }
       }
       //Moving forward to the target object
@@ -83,10 +85,14 @@ function onMouseClicked() {
         })
         .onComplete(function () {
           isFlying = false;
+          if (spriteDictionary[spriteId].labelSprite != null)
+          {
+            jump(spriteDictionary[spriteId].labelSprite);
+          }
         });
         tween_rotate.chain(tween_forward);
   	} else {
-      // reset objects
+      controls.autoRotate = true;
       //console.log('Nothing got clicked');
     } //end of intersect.length > 0
   } // end of isFlying
@@ -96,7 +102,6 @@ function onMouseMove(event) {
   // update the mouse position
   mouse.x = ( event.clientX / window.innerWidth ) * 2.0 - 1.0;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2.0 + 1.0;
-
   raycaster.setFromCamera( mouse, camera );
   var intersects = raycaster.intersectObjects( interactionObjects, true );
   // if there is one (or more) intersections
@@ -121,25 +126,52 @@ function resetHightLight() {
     highlighted.material.color.setHex( 0xffffff );
   }
 }
-function resetMaterial(){
-  if (lastSelected != null)
+function resetSprite(){
+  if (lastSelected.object != null)
   {
     for (var n = 0; n < spriteGroup.children.length; n++)
     {
       spriteGroup.children[n].material.opacity = 1.0;
+      spriteGroup.children[n].visible = true;
     }
   }
 }
 function resetMetaLabel(){
-  if (metaLabel != null)
-  {
-      metaLabel.material.opacity = 0;
+  for (var key in visibleLabels){
+    // visibleLabels[key].visible = false;
+    // delete visibleLabels[key];
+    makeInvisible(visibleLabels[key]);
   }
 }
 function resetLines(){
-  if (lastSelected != null && lastSelected.line != null)
+  if (lastSelected.line != null)
   {
     scene.remove(lastSelected.line) ;
     lastSelected.line = null;
   }
+}
+
+function onKeydown(event){
+
+  if (lastSelected.object != null && event.key == '.'){
+    currentTarget += 1;
+    if (spriteDictionary[currentTarget].labelSprite == null)
+    {
+      generate_label(spriteDictionary[currentTarget], true);
+    } else {
+      jump(spriteDictionary[currentTarget].labelSprite);
+    }
+
+  } else if (lastSelected.object!= null && event.key == ','){
+    currentTarget -= 1;
+    if (spriteDictionary[currentTarget].labelSprite == null)
+    {
+      generate_label(spriteDictionary[currentTarget], true);
+    } else {
+      jump(spriteDictionary[currentTarget].labelSprite);
+    }
+  }
+}
+function onKeyup(event){
+
 }
