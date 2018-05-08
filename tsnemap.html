@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Moments</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+		body, html  {
+		    display: block;
+		    margin: 0px;
+				color: white;
+				font-family: Helvetica;
+				font-size: 14px;
+				padding: 0px;
+		}
+		button {
+
+		}
+		table {
+			border-collapse: collapse;
+		}
+		table, th, td {
+			border: 1px solid white;
+		}
+		td {
+			padding: 5px
+		}
+		#float_div {
+			position: absolute;
+			top: 5px;
+			left: 5px;
+			padding: 5px;
+			z-index: 1;
+			opacity: 0.8;
+		  color: white;
+			background-color: #669999;
+		}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="float_div">
+			<table border='1'>
+				<tr>
+					<td>
+						Corpora
+					</td>
+					<td>
+						<input type="checkbox" id="human_check" name="Human" value="human" onchange = 'onChange(this)' checked>
+						<label for="human_check">Human Play</label>
+						<br />
+						<input type="checkbox" id="algorithm_check" name="Algorithm" value="algorithm" onchange = 'onChange(this)' checked>
+						<label for="algorithm_check">Auto Play</label>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<input type="text" id="moment_id">
+						<button type="button" id ="moment_button" onclick="onMomentInput()">Go to Moment</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<script src="http://code.jquery.com/jquery-3.3.1.js"
+		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+		crossorigin="anonymous"></script>
+		<script src="js/lib/three.js"></script>
+		<script src="js/lib/tween.js"></script>
+		<script src="js/lib/OrbitControls.js"></script>
+		<script src="js/lib/Projector.js"></script>
+		<script src="js/Globals.js"></script>
+		<script src="js/shaders/skybox_vs.js"></script>
+		<script src="js/shaders/skybox_fs.js"></script>
+		<script src="js/objects/metaLabels.js"></script>
+		<script src="js/objects/skybox.js"></script>
+		<script src="js/objects/Lines.js"></script>
+		<script src="js/objects/Arrows.js"></script>
+		<script src="js/objects/Sprites.js"></script>
+		<script src="js/objects/camera.js"></script>
+		<script src="js/urlHandler.js"></script>
+		<script src="js/EventHandler.js"></script>
+		<script src="js/Scene.js"></script>
+</body>
+
+</html>

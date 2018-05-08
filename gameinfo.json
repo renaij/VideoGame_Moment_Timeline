@@ -1,0 +1,10 @@
+{
+  "Super Mario World (USA)": {
+    "2": "./pic/Super Mario World (USA)_2D.json",
+    "3": "./pic/Super Mario World (USA)_3D.json"
+  },
+  "The 7th Saga (USA)": {
+    "2": "./pic/The 7th Saga (USA)_2D.json",
+    "3": "./pic/The 7th Saga (USA)_3D.json"
+  }
+}
