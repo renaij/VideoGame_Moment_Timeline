@@ -37,5 +37,6 @@ function initAudio() {
 	});//sound for next page
 }
 function playSound(object) {
+  //object.stop();
   object.play();
 }
