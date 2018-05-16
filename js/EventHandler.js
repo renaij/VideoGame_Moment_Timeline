@@ -63,7 +63,7 @@ function onMouseMove(event) {
   if ( intersects.length > 0 )
   {
 	  ////////////////////////////////////////////////////////////Chris's Code
-    playSound(soundOnSelect); //sound for selecting
+    //playSound(soundOnSelect); //sound for selecting
 	  ///////////////////////////////////////////////////
 	  //console.log("wow");
     resetHightLight();
