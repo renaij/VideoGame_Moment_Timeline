@@ -4,49 +4,27 @@
 		<title>Moments</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="css/UI.css" type="text/css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<style>
-		body, html  {
-		    display: block;
-		    margin: 0px;
-				color: white;
-				font-family: Helvetica;
-				font-size: 14px;
-				padding: 0px;
-		}
-		button {
-
-		}
-		table {
-			border-collapse: collapse;
-		}
-		table, th, td {
-			border: 1px solid white;
-		}
-		td {
-			padding: 5px
-		}
-		#float_div {
-			position: absolute;
-			top: 5px;
-			left: 5px;
-			padding: 5px;
-			z-index: 1;
-			opacity: 0.8;
-		  color: white;
-			background-color: #669999;
-		}
 		</style>
 	</head>
 	<body>
+		<div id="loading-scene">
+			<div id="loader-wrapper">
+				<div id="loader"></div>
+			</div>
+			<div id="loader-info">
+				<p>Generating Moment Space...</p>
+			</div>
+		</div>
 		<div id="container"></div>
-		<div id="float_div">
+		<!--div id="float_div" style="display:none">
 			<table border='1'>
 				<tr>
 					<td>
-						Corpora
-					</td>
-					<td>
-						<input type="checkbox" id="human_check" name="Human" value="human" onchange = 'onChange(this)' checked>
+						<input type="checkbox" id="human_check" name="Human" value="human" onchange='onChange(this)' checked>
 						<label for="human_check">Human Play</label>
 						<br />
 						<input type="checkbox" id="algorithm_check" name="Algorithm" value="algorithm" onchange = 'onChange(this)' checked>
@@ -60,10 +38,32 @@
 					</td>
 				</tr>
 			</table>
+		</div-->
+		<div class="top-bar" id="top_bar" style="display:none">
+			<div class="corpora-btn-wrapper">
+				<button class="button" id="corpora-btn" onclick="onShowCorporaBar(this.id)">Corpora</button>
+			</div>
+			<div class="bookmark-btn-wrapper">
+				<button class="button" id="bookmark-btn" onclick="onShowBookmarkBar(this.id)">Bookmark</button>
+			</div>
+			<div class="search-container">
+				<div class="search-wrapper">
+					<input type="text" placeholder="Search Moments" id="moment_id" name="search">
+					<button type="submit" class="search-btn" id="moment_button" onclick="onMomentInput()"><i class="fa fa-search"></i></button>
+				</div>
+			</div>
+		</div>
+		<div id="corpora_bar" style="display:none"></div>
+		<div id="bottomright-bar" style="display:none;">
+			<p id="game-info"></p>
 		</div>
 		<script src="https://code.jquery.com/jquery-3.3.1.js"
 		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
 		crossorigin="anonymous"></script>
+		<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+  crossorigin="anonymous"></script>
 		<script src="js/lib/three.js"></script>
 		<script src="js/lib/tween.js"></script>
 		<script src="js/lib/OrbitControls.js"></script>
@@ -77,8 +77,11 @@
 		<script src="js/objects/Arrows.js"></script>
 		<script src="js/objects/Sprites.js"></script>
 		<script src="js/objects/camera.js"></script>
+		<script src="js/AudioLoad.js"></script>
 		<script src="js/urlHandler.js"></script>
 		<script src="js/EventHandler.js"></script>
+		<script src="js/uiHandler.js"></script>
+		<script src="js/bookmarks.js"></script>
 		<script src="js/Scene.js"></script>
 </body>
 

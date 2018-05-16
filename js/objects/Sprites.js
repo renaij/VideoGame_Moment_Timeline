@@ -11,8 +11,11 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
   var positionFile = jsonObj.positions.bin;
   var dimensions = jsonObj.positions.dimensions;
   var spriteSheetPath = jsonObj.spriteSheetPath;
-  var totalMap = textureLoader.load(spriteSheetPath);
-
+  expectedActions += 1;
+  var totalMap = textureLoader.load(spriteSheetPath, function() {
+    actionCounter += 1;
+  });
+  expectedActions += 1;
   fileLoader.setResponseType( 'arraybuffer' );
   fileLoader.load(positionFile, function(binary) {
     var spriteGroup = new THREE.Group();
@@ -40,16 +43,12 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
       };
       var spriteMaterial = new THREE.SpriteMaterial( { map: totalMap, color: 0xffffff} );
       var sprite = new THREE.Sprite( spriteMaterial, params);
-      //Assuming dimensions >= 2
 
-      if (i == 926 || i == 1037 || i == 259) {
-        console.log(i + '_' + positionArray[i]);
-      }
       if (positionArray[i].length <= 2)
       {
-        sprite.position.set(positionArray[i][0], 0.0, positionArray[i][1]);
+        sprite.position.set(positionArray[i][0], 0.0, positionArray[i][1]); //2D
       } else {
-        sprite.position.set(positionArray[i][0], positionArray[i][1], positionArray[i][2]);
+        sprite.position.set(positionArray[i][0], positionArray[i][1], positionArray[i][2]); //3D
       }
       sprite.name = totalIndex.toString();
       sprite.center = anchor;
@@ -69,15 +68,17 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
       };
     } // for i in position
     //Add groups for raycasting
-    interactionObjects.push(spriteGroup);
-    scene.add(spriteGroup);
+    interactionObjects[corpusName] = spriteGroup;
     //indexing each corpus as a group
     spriteGroups[corpusName] = spriteGroup;
-    numberBase.val += number;
+    numberBase.val += number; //Counter for globalID
+    scene.add(spriteGroup);
+    actionCounter += 1;
   });  //end of fileLoader.load
 }
 
 var addSprites = function(){
+  expectedActions += 1;
   //Read JSON file
   fileLoader.load(spriteJSONPath, function (data) {
     var jsonData = JSON.parse(data);
@@ -87,6 +88,7 @@ var addSprites = function(){
     for (var corpusName in jsonData.corpus) {
       addSpritesToScene(corpusName, numberBase, jsonData);
     }; // end of for each corpusName
+    actionCounter += 1;
   });
 };
 var enableSpritesInteractions = function(){
@@ -97,5 +99,23 @@ var enableSpritesInteractions = function(){
     {
       interactionObjects.push(spriteGroups[corpus]);
     }
+  }
+}
+function toggleGroupRaycasting(corpus,enabled){
+  if (enabled){
+    interactionObjects[corpus] = spriteGroups[corpus];
+  } else {
+    delete interactionObjects[corpus];
+  }
+}
+function toggleSpriteGroup(corpus, enabled) {
+  if (enabled) {
+    opacity = 1.0;
+  } else {
+    opacity = 0.05;
+  }
+  for (var i = 0; i < spriteGroups[corpus].children.length; i++)
+  {
+    spriteGroups[corpus].children[i].material.opacity = opacity;
   }
 }

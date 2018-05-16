@@ -4,7 +4,7 @@ var input = document.getElementById("moment_id");
 // Execute a function when the user releases a key on the keyboard
 input.addEventListener("keyup", function(event) {
   // Cancel the default action, if needed
-  event.preventDefault();
+  //event.preventDefault();
   // Number 13 is the "Enter" key on the keyboard
   if (event.keyCode === 13) {
     // Trigger the button element with a click
@@ -12,15 +12,13 @@ input.addEventListener("keyup", function(event) {
   }
 });
 
-function onMouseDown() {
+function onMouseDown(event) {
+  //event.preventDefault();
   lastClickedTime = performance.now();
 }
-function onMouseUp() {
+function onMouseUp(event) {
+  //event.preventDefault();
   if (!isFlying) {
-    // if mouse up on top of the floating div, nothing happens
-    if (event.clientX <= FLOATING_DIV_RIGHT && event.clientY <= FLOATING_DIV_BOTTOM) {
-      return;
-    }
     //if it's a drag, do nothing;
     if (performance.now() - lastClickedTime > 200)
     {
@@ -32,7 +30,7 @@ function onMouseUp() {
 
     //var startingTime = performance.now();
     raycaster.setFromCamera( mouse, camera );
-    var intersects = raycaster.intersectObjects( interactionObjects, true );
+    var intersects = raycaster.intersectObjects( Object.values(interactionObjects), true );
     //console.log('DEBUGGING: Ray Cast - ' + (performance.now() - startingTime)); startingTime = performance.now();
     resetMetaLabel();
     resetSprites();
@@ -40,25 +38,34 @@ function onMouseUp() {
     // if there is one (or more) intersections
   	if ( intersects.length > 0 )
   	{
+	    ///////////////////////////////////////////////////Chris's Code
+      playSound(soundOnClick); //Sound for Clicking
+	    ////////////////////////////////////////////////
       showNearbyLabels(intersects[0].object);
+      updateURL(Number(intersects[0].object.name));
   	} else {
-      controls.autoRotate = true;
+      //controls.autoRotate = true;
       lastSelected.object = null;
+      autoRotate = true;
       //console.log('Nothing got clicked');
     } //end of intersect.length > 0
   } // end of isFlying
 }
 
 function onMouseMove(event) {
-  event.preventDefault();
+  //event.preventDefault();
   // update the mouse position
   mouse.x = ( event.clientX / window.innerWidth ) * 2.0 - 1.0;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2.0 + 1.0;
   raycaster.setFromCamera( mouse, camera );
-  var intersects = raycaster.intersectObjects( interactionObjects, true );
+  var intersects = raycaster.intersectObjects( Object.values(interactionObjects), true );
   // if there is one (or more) intersections
   if ( intersects.length > 0 )
   {
+	  ////////////////////////////////////////////////////////////Chris's Code
+    playSound(soundOnSelect); //sound for selecting
+	  ///////////////////////////////////////////////////
+	  //console.log("wow");
     resetHightLight();
     highlighted = intersects[0].object;
     highlighted.material.color.setHex( 0x10ffff );
@@ -87,7 +94,8 @@ function resetSprites(){
   }
 }
 function resetSpritesInCorpus(corpus){
-  if (document.getElementById(corpus + "_check").checked){
+  //if (document.getElementById(corpus + "_check").checked){
+  if (corpus in interactionObjects){
     for (var i = 0; i < spriteGroups[corpus].children.length; i++)
     {
       spriteGroups[corpus].children[i].material.opacity = 1.0;
@@ -111,22 +119,28 @@ function resetLines(){
 function onKeydown(event){
   // should check if selected item is part of some object
   if (lastSelected.object != null && (event.key == '.' || event.key == '>')){
-    currentTarget += 1;
-    if (spriteDictionary[currentTarget].labelSprite == null)
+    if (currentTarget >= Object.keys(spriteDictionary).length - 1)
     {
-      showLabel(spriteDictionary[currentTarget], true);
-    } else {
-      jump(spriteDictionary[currentTarget].labelSprite);
+      return;
     }
+    ////////////////////////////////////////////////////////////Chris's Code
+    playSound(soundOnNext); //sound for next page
+  	//////////////////////////////////////////////////////////////////////
+    currentTarget += 1;
+    showNearbyLabels(spriteDictionary[currentTarget].object,true);
+    updateURL(Number(currentTarget));
 
   } else if (lastSelected.object!= null && (event.key == ',' || event.key == '<')){
-    currentTarget -= 1;
-    if (spriteDictionary[currentTarget].labelSprite == null)
+    if (currentTarget == 0)
     {
-      showLabel(spriteDictionary[currentTarget], true);
-    } else {
-      jump(spriteDictionary[currentTarget].labelSprite);
+      return;
     }
+    currentTarget -= 1;
+    showNearbyLabels(spriteDictionary[currentTarget].object,true);
+    updateURL(Number(currentTarget));
+    ////////////////////////////////////////////////////////////Chris's Code
+    playSound(soundOnNext); //sound for next page
+	  ////////////////////////////////////////////////////////////Chris's Code
   }
 }
 function onKeyup(event){
@@ -150,31 +164,95 @@ function onChange(checkbox) {
   enableSpritesInteractions();
 }
 
-function onMomentInput() {
+function onMomentInput(event) {
+  //Equivalent to clicking on a moment sprite
   var inputMomentId = document.getElementById("moment_id");
   inputMomentId.blur();
   var inputMomentId = inputMomentId.value;
   resetMetaLabel();
   resetSprites();
   showNearbyLabels(spriteDictionary[Number(inputMomentId)].object);
-  //url manipulation example
-  var params = {};
-  params['corpora'] = [];
-  if (document.getElementById("human_check") != null){
-    params['corpora'].push("human");
-  }
-  if (document.getElementById("algorithm_check") != null){
-    params['corpora'].push("algorithm");
-  }
-  if (document.getElementById("expert_check") != null){
-    params['corpora'].push("expert");
-  }
-  if (document.getElementById("attractmode_check") != null){
-    params['corpora'].push("attractmode");
-  }
-  params['moment_id'] = inputMomentId;
-  params['position'] = camera.position.toArray();
-  var urlString = getUrlString(params);
-  writeURL(urlString);
-  var urlParam = parseURL();
+  updateURL(Number(inputMomentId));
+  playSound(soundOnClick);//Sound for Clicking
 }
+//Save a new bookmark
+function onBookmarking(event) {
+  if (lastSelected.object != null && (event.key == 'b')){
+    addBookmark(Number(lastSelected.object.name), window.location.href);
+  }
+}
+//Retrieve moment by bookmark
+function onReadBookmark(event) {
+  if (event.key == '_' || event.key == '-' ){
+    var bookmark_url = getLastBookmark();
+  }
+  else if (event.key == '+' || event.key == '=' ){
+    var bookmark_url = getNextBookmark();
+  }
+  if (bookmark_url != null){
+    var params = parseURL(bookmark_url);
+    if ("moment_id" in params) {
+      var inputMomentId = Number(params['moment_id']);
+      showNearbyLabels(spriteDictionary[inputMomentId].object, true);
+      updateURL(Number(inputMomentId));
+      playSound(soundOnNext); //sound for next page
+    }
+  }
+}
+//////////////////////////////////////////////Chris's code
+function myKeyDown(event){
+	event = event || window.event;
+	switch(event.keyCode){
+		case 87:
+			moveFoward = true;
+			break;
+		case 83:
+			moveBackward = true;
+			break;
+		case 65:
+			turnLeft = 1;
+			break;
+ 		case 68:
+			turnRight = 1;
+			break;
+		case 82:
+			turnUp = 1;
+			break;
+		case 70:
+			turnDown = 1;
+			break;
+	}
+	updateRotation();
+};
+
+function myKeyUp (event){
+  event = event || window.event;
+		switch(event.keyCode){
+		case 87:
+			moveFoward = false;
+			break;
+		case 83:
+			moveBackward = false;
+			break;
+		case 65:
+			turnLeft = 0;
+			break;
+ 		case 68:
+			turnRight = 0;
+			break;
+		case 82:
+			turnUp = 0;
+			break;
+		case 70:
+			turnDown = 0;
+			break;
+	}
+	updateRotation();
+};
+
+function updateRotation(){
+	rotationVector.x = ( - turnDown + turnUp );
+	rotationVector.y = ( - turnRight + turnLeft );
+	//update the rotation's direction
+};
+////////////////////////////////////////////////////

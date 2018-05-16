@@ -1,5 +1,5 @@
 //Jump between moments
-var jump = function(target){
+var _jumpToTarget = function(target){
   camera.lookAt(target.position);
   cameraPos = target.position.clone();
   var lookAtVector = new THREE.Vector3(0,0, -1);
@@ -8,12 +8,12 @@ var jump = function(target){
   cameraPos.sub(lookAtVector) ;
   camera.position.set(cameraPos.x, cameraPos.y,cameraPos.z);
   controls.target = target.position;
-  showTarget(target);
+  _showTarget(target);
 }
 var frustum = new THREE.Frustum();
 var cameraViewProjectionMatrix = new THREE.Matrix4();
 //Show only the target sprite, hiding other sprites in camera view
-var showTarget = function(target){
+var _showTarget = function(target){
   //every time the camera or objects change position (or every frame)
   camera.updateMatrixWorld(); // make sure the camera matrix is updated
   camera.matrixWorldInverse.getInverse( camera.matrixWorld );
@@ -41,7 +41,7 @@ var makeInvisible = function(obj){
   delete visibleLabels[obj.name];
 }
 //Move the camera to target by flying over
-var flyToTarget = function(targetObj){
+var flyToTarget = function(targetObj, skipAnimation = false){
   var targetId = Number(targetObj.name);
   startingTime = performance.now();
   //Moving forward to the target object
@@ -50,13 +50,24 @@ var flyToTarget = function(targetObj){
   target = targetObj.position.clone();
   target.sub(direction) ;
   flyTo =  target;
-  var controlRange = spaceScale - target.length();
+  //var controlRange = spaceScale - target.length();
   flyFrom = camera.position;
   isFlying = true;
   lookAtOrg = controls.target.clone();
   lookAtDest = targetObj.position;
   duration = flyingDuration;
+  if (skipAnimation) {
+    isFlying = false;
+    controls.target = lookAtDest;
+    camera.lookAt(targetObj.position);
+    if (spriteDictionary[targetId].labelSprite != null)
+    {
+      _jumpToTarget(spriteDictionary[targetId].labelSprite);
+      updateURL(targetId);
+    }
 
+    return;
+  }
   // console.log('DEBUGGING: Flying Started - ' + (performance.now() - startingTime)); startingTime = performance.now();
 
   //reference to http://sole.github.io/tween.js/examples/03_graphs.html
@@ -65,7 +76,7 @@ var flyToTarget = function(targetObj){
       camera.lookAt(this.x, this.y, this.z);})
     .onComplete(function () {
       controls.target = lookAtDest;
-      controls.maxDistance = controlRange;
+      //controls.maxDistance = controlRange;
       isFlying = false;})
     .start();
   var tween_forward = new TWEEN.Tween(flyFrom)
@@ -73,7 +84,6 @@ var flyToTarget = function(targetObj){
     .easing(TWEEN.Easing.Quintic.InOut)
     .onUpdate(function () {
       isFlying = true;
-
       camera.position.set(this.x, this.y, this.z);
       //IMPORTANT!
       camera.lookAt(targetObj.position);
@@ -83,8 +93,10 @@ var flyToTarget = function(targetObj){
       // console.log('DEBUGGING: Flying Finished - ' + (performance.now() - startingTime)); startingTime = performance.now();
       if (spriteDictionary[targetId].labelSprite != null)
       {
-        jump(spriteDictionary[targetId].labelSprite);
+        _jumpToTarget(spriteDictionary[targetId].labelSprite);
+        updateURL(targetId);
       }
+
     });
     tween_rotate.chain(tween_forward);
 }

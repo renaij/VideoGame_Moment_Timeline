@@ -16,9 +16,9 @@ function resize(size)
   var pos =  Math.ceil(Math.log2(nSize));  //(ceiling of log n with base 2)
   return Math.pow(2, pos);
 }
-function showNearbyLabels(clickedObj){
+function showNearbyLabels(clickedObj, skipAnimation = false){
   startingTime = performance.now();
-  controls.autoRotate = false;
+  //controls.autoRotate = false;
   // console.log("DEBUGGING clicked:" + clickedObj.name );
   lastSelected.object = clickedObj;
   //currentTarget = 0;
@@ -43,14 +43,15 @@ function showNearbyLabels(clickedObj){
       spriteDictionary[n].object.material.opacity = 0.1;
     } else {
       //Show detailed views and hide low-res views
-      showLabel(spriteDictionary[n]);
+      _showLabel(spriteDictionary[n]);
     }
   }
   // console.log('DEBUGGING: Labels Generated - ' + (performance.now() - startingTime));
+  flyToTarget(clickedObj, skipAnimation);
 
-  flyToTarget(clickedObj);
 }
-function showLabel(sprite, jumpToTarget = false) {
+function _showLabel(sprite) {
+  autoRotate = false;
   //Jump straight to target if metalabel for this sprite already exists:
   if (sprite.labelSprite != null)
   {
@@ -60,15 +61,12 @@ function showLabel(sprite, jumpToTarget = false) {
     sprite.labelSprite.material.opacity = 1;
     makeVisible(sprite.labelSprite);
     makeInvisible(sprite.object);
-    if (jumpToTarget) {
-      jump(sprite.labelSprite);
-    }
     return;
   }
-  createLabel(sprite, jumpToTarget);
+  _createLabel(sprite);
 }
 
-function createLabel(sprite, jumpToTarget = false) {
+function _createLabel(sprite) {
   var imageFile =  sprite.image;
   imageLoader.load(
   	imageFile,
@@ -122,9 +120,5 @@ function createLabel(sprite, jumpToTarget = false) {
       makeVisible(sprite.labelSprite);
       scene.add(sprite.labelSprite);
       makeInvisible(sprite.object);
-
-      if (jumpToTarget) {
-        jump(sprite.labelSprite);
-      }
 	});
 }

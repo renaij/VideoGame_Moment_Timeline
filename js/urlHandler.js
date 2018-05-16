@@ -1,4 +1,3 @@
-var url1 = new URL(window.location);
 var bookmarks = {};
 var urlParams = {game: null, corpora: null, dimension: null, moment_id: null, position: null};
 
@@ -28,8 +27,32 @@ function writeURL(urlString) {
   history.replaceState({},"",urlString);
 }
 
-function parseURL() {
-  paramsString = window.location.href.substr(window.location.href.indexOf('#'));
+function updateURL(momentId) {
+  //url manipulation example
+  var params = {};
+  params['corpora'] = [];
+  if (document.getElementById("human_check") != null){
+    params['corpora'].push("human");
+  }
+  if (document.getElementById("algorithm_check") != null){
+    params['corpora'].push("algorithm");
+  }
+  if (document.getElementById("expert_check") != null){
+    params['corpora'].push("expert");
+  }
+  if (document.getElementById("attractmode_check") != null){
+    params['corpora'].push("attractmode");
+  }
+  params['moment_id'] = momentId;
+  params['position'] = camera.position.toArray();
+  params['game'] = initParams['game'];
+  params['dimension'] = initParams['dimension'];
+  var urlString = getUrlString(params);
+  writeURL(urlString);
+}
+
+function parseURL(url) {
+  paramsString = url.substr(url.indexOf('#'));
   paramsArr = paramsString.replace('#', '').replace(/%20/g, ' ').split(';');
   params = {};
 
