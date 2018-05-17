@@ -116,6 +116,8 @@ function animate() {
   camera.translateZ( velocity.z * delta );//for moving forward and backward
   turning();
   ////////////////////////////////////////////////
+  prevTime = now;
+  camera.updateProjectionMatrix();
 }
 function render() {
   renderer.render( scene, camera );

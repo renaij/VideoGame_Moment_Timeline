@@ -15,6 +15,7 @@ input.addEventListener("keyup", function(event) {
 function onMouseDown(event) {
   //event.preventDefault();
   lastClickedTime = performance.now();
+  document.getElementById("moment_id").blur();
 }
 function onMouseUp(event) {
   //event.preventDefault();
@@ -198,6 +199,9 @@ function onReadBookmark(event) {
       playSound(soundOnNext); //sound for next page
     }
   }
+}
+function onRenderDetails() {
+  
 }
 //////////////////////////////////////////////Chris's code
 function myKeyDown(event){

@@ -1,5 +1,6 @@
 var listener = new THREE.AudioListener();
 var soundOnSelect = new THREE.Audio( listener );
+var soundOnShow = new THREE.Audio( listener );
 var soundOnClick = new THREE.Audio( listener );
 var soundOnNext = new THREE.Audio( listener ); //variables on UI sounds
 var Music = new THREE.Audio( listener );
@@ -9,13 +10,20 @@ function initAudio() {
   expectedActions += 1;
   audioLoader.load( 'sound/BackgroundMusic.mp3', function( buffer ) {
     Music.setBuffer( buffer );
-    Music.setLoop( false );
+    Music.setLoop( true );
     Music.setVolume( 0.3 );
     Music.play();//backgroundmusic
     actionCounter += 1;
   });
   expectedActions += 1;
-  audioLoader.load( 'sound/OnClick.mp3', function( buffer ) {
+  audioLoader.load( 'sound/OnShow.mp3', function( buffer ) {
+    soundOnShow.setBuffer( buffer );
+    soundOnShow.setLoop( false );
+    soundOnShow.setVolume( 0.1 );
+    actionCounter += 1;
+  });
+  expectedActions += 1;
+  audioLoader.load( 'sound/OnSelect.wav', function( buffer ) {
     soundOnClick.setBuffer( buffer );
     soundOnClick.setLoop( false );
     soundOnClick.setVolume( 0.3 );

@@ -75,6 +75,7 @@ var flyToTarget = function(targetObj, skipAnimation = false){
     .onUpdate(function(){
       camera.lookAt(this.x, this.y, this.z);})
     .onComplete(function () {
+      playSound(soundOnShow); //Sound for Clicking
       controls.target = lookAtDest;
       //controls.maxDistance = controlRange;
       isFlying = false;})
@@ -99,4 +100,17 @@ var flyToTarget = function(targetObj, skipAnimation = false){
 
     });
     tween_rotate.chain(tween_forward);
+}
+function getFrustrum(){
+  //every time the camera or objects change position (or every frame)
+  camera.updateMatrixWorld(); // make sure the camera matrix is updated
+  camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+  cameraViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+  frustum.setFromMatrix( cameraViewProjectionMatrix );
+}
+function isInCameraView(object) {
+  return frustum.intersectsSprite( object);
+}
+function distanceToCamera(object) {
+  return object.position.distanceTo( camera.position );
 }
