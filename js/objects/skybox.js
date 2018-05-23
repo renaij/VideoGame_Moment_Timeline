@@ -10,16 +10,10 @@ var addSkybox = function(){
       vertexShader: skybox_vertexShader,
       fragmentShader: skybox_fragmentShader
     } );
-
   material.depthWrite = false;
   material.side = THREE.BackSide;
-  //var geometry = new THREE.BoxGeometry( spaceScale*1.2, spaceScale*1.2, spaceScale*1.2 );
 
   var geometry = new THREE.SphereBufferGeometry(spaceScale );
-
   skybox = new THREE.Mesh( geometry, material );
-
   scene.add( skybox );
-
-
 }

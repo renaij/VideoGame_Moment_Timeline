@@ -1,4 +1,5 @@
 var anchor = new THREE.Vector2(0.5,0.5);
+var dataPool = {};
 
 var addSpritesToScene = function(corpusName, numberBase, dataObj){
   var game = dataObj.game;
@@ -13,8 +14,11 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
   var spriteSheetPath = jsonObj.spriteSheetPath;
   expectedActions += 1;
   var totalMap = textureLoader.load(spriteSheetPath, function() {
+    dataPool[corpusName]['texture'] = totalMap.clone();  
     actionCounter += 1;
   });
+  dataPool[corpusName]['UVs'] = {};
+
   expectedActions += 1;
   fileLoader.setResponseType( 'arraybuffer' );
   fileLoader.load(positionFile, function(binary) {
@@ -41,6 +45,7 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
           v: jsonObj.spritesheet[i].uvRepeat_v
         }
       };
+      dataPool[corpusName]['UVs'][totalIndex] = params;
       var spriteMaterial = new THREE.SpriteMaterial( { map: totalMap, color: 0xffffff} );
       var sprite = new THREE.Sprite( spriteMaterial, params);
 
@@ -86,6 +91,7 @@ var addSprites = function(){
 
     //corpora iteration
     for (var corpusName in jsonData.corpus) {
+      dataPool[corpusName] = {};
       addSpritesToScene(corpusName, numberBase, jsonData);
     }; // end of for each corpusName
     actionCounter += 1;
@@ -112,7 +118,7 @@ function toggleSpriteGroup(corpus, enabled) {
   if (enabled) {
     opacity = 1.0;
   } else {
-    opacity = 0.05;
+    opacity = OPACITY_FOR_HIDING;
   }
   for (var i = 0; i < spriteGroups[corpus].children.length; i++)
   {

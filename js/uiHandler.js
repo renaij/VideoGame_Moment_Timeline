@@ -5,15 +5,7 @@ function showPage() {
   document.getElementById("top_bar").style.display = "block";
   document.getElementById("bottomright-bar").style.display = "block";
 }
-function loadingScene() {
-  if ((actionCounter == expectedActions) && (!isPageShown))
-  {
-    addCorporaButtons();
-    cameraReady();
-    showPage();
-    isPageShown = true;
-  }
-}
+
 function addGameInfo(game) {
   $('#game-info').text(game);
 }
@@ -48,28 +40,23 @@ function onShowCorporaBar(id) {
     //document.getElementById("float_div").style.display = "block";
     document.getElementById("corpora_bar").style.display = "block";
     $('#corpora-btn').switchClass('button', 'button-clicked','fast');
-    // var children = $('#corpora_bar').children();
-    // for (var i = 0; i < children.length; i++) {
-    //
-    // }
   }
 }
 function onShowBookmarkBar(id){
-  var isClicked = $('#' + id).hasClass("button-clicked");
-  if (isClicked) {
+  var isBkmkBtnClicked = $('#' + id).hasClass("button-clicked");
+  if (isBkmkBtnClicked) {
     $('#bookmark-btn').switchClass('button-clicked', 'button','fast');
+    hideBookmarkLabels();
   } else {
     $('#bookmark-btn').switchClass('button', 'button-clicked','fast');
-    // var children = $('#corpora_bar').children();
-    // for (var i = 0; i < children.length; i++) {
-    //
-    // }
+    //Show bookmarks
+    showBookmarkLabels();
   }
 }
 function onShowCorpus(id){
   var group = id.substr(0, id.lastIndexOf("-btn"));
-  var isClicked = $('#' + id).hasClass("button-sm-clicked");
-  if ( isClicked ) {
+  var isCorpusBtnClicked = $('#' + id).hasClass("button-sm-clicked");
+  if ( isCorpusBtnClicked ) {
     $('#' + id).switchClass('button-sm-clicked', 'button-sm','fast');
     //Hide corpus
     toggleSpriteGroup(group, false);

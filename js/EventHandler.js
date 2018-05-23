@@ -39,15 +39,17 @@ function onMouseUp(event) {
     // if there is one (or more) intersections
   	if ( intersects.length > 0 )
   	{
+      autoRotate = false;
 	    ///////////////////////////////////////////////////Chris's Code
       playSound(soundOnClick); //Sound for Clicking
 	    ////////////////////////////////////////////////
       showNearbyLabels(intersects[0].object);
-      updateURL(Number(intersects[0].object.name));
+      updateURL(URLKeys.MOMENT, Number(intersects[0].object.name));
   	} else {
       //controls.autoRotate = true;
       lastSelected.object = null;
       autoRotate = true;
+      updateURL(URLKeys.MOMENT, null);
       //console.log('Nothing got clicked');
     } //end of intersect.length > 0
   } // end of isFlying
@@ -86,12 +88,9 @@ function resetHightLight() {
   }
 }
 function resetSprites(){
-  if (lastSelected.object != null)
+  for (var corpusname in spriteGroups)
   {
-    for (var corpusname in spriteGroups)
-    {
-      resetSpritesInCorpus(corpusname);
-    }
+    resetSpritesInCorpus(corpusname);
   }
 }
 function resetSpritesInCorpus(corpus){
@@ -124,21 +123,23 @@ function onKeydown(event){
     {
       return;
     }
+    autoRotate = false;
     ////////////////////////////////////////////////////////////Chris's Code
     playSound(soundOnNext); //sound for next page
   	//////////////////////////////////////////////////////////////////////
     currentTarget += 1;
     showNearbyLabels(spriteDictionary[currentTarget].object,true);
-    updateURL(Number(currentTarget));
+    updateURL(URLKeys.MOMENT, Number(currentTarget));
 
   } else if (lastSelected.object!= null && (event.key == ',' || event.key == '<')){
     if (currentTarget == 0)
     {
       return;
     }
+    autoRotate = false;
     currentTarget -= 1;
     showNearbyLabels(spriteDictionary[currentTarget].object,true);
-    updateURL(Number(currentTarget));
+    updateURL(URLKeys.MOMENT, Number(currentTarget));
     ////////////////////////////////////////////////////////////Chris's Code
     playSound(soundOnNext); //sound for next page
 	  ////////////////////////////////////////////////////////////Chris's Code
@@ -147,62 +148,42 @@ function onKeydown(event){
 function onKeyup(event){
 
 }
-function onChange(checkbox) {
-  var box = checkbox.value;
-  if (checkbox.checked)
-  {
-    for (var i = 0; i < spriteGroups[box].children.length; i++)
-    {
-      spriteGroups[box].children[i].material.opacity = 1.0;
-    }
-  }
-  if (!checkbox.checked) {
-    for (var i = 0; i < spriteGroups[box].children.length; i++)
-    {
-      spriteGroups[box].children[i].material.opacity = 0.05;
-    }
-  }
-  enableSpritesInteractions();
-}
 
 function onMomentInput(event) {
   //Equivalent to clicking on a moment sprite
   var inputMomentId = document.getElementById("moment_id");
   inputMomentId.blur();
   var inputMomentId = inputMomentId.value;
+  autoRotate = false;
   resetMetaLabel();
   resetSprites();
   showNearbyLabels(spriteDictionary[Number(inputMomentId)].object);
-  updateURL(Number(inputMomentId));
+  updateURL(URLKeys.MOMENT, Number(inputMomentId));
   playSound(soundOnClick);//Sound for Clicking
 }
+
 //Save a new bookmark
 function onBookmarking(event) {
   if (lastSelected.object != null && (event.key == 'b')){
-    addBookmark(Number(lastSelected.object.name), window.location.href);
+    addBookmark(Number(lastSelected.object.name));
+    updateURL(URLKeys.BOOKMARK, getBookmarks());
   }
 }
 //Retrieve moment by bookmark
 function onReadBookmark(event) {
   if (event.key == '_' || event.key == '-' ){
-    var bookmark_url = getLastBookmark();
+    var momentId = getLastBookmark();
   }
   else if (event.key == '+' || event.key == '=' ){
-    var bookmark_url = getNextBookmark();
+    var momentId = getNextBookmark();
   }
-  if (bookmark_url != null){
-    var params = parseURL(bookmark_url);
-    if ("moment_id" in params) {
-      var inputMomentId = Number(params['moment_id']);
-      showNearbyLabels(spriteDictionary[inputMomentId].object, true);
-      updateURL(Number(inputMomentId));
-      playSound(soundOnNext); //sound for next page
-    }
+  if (momentId != null){
+    showNearbyLabels(spriteDictionary[momentId].object, true);
+    updateURL(URLKeys.MOMENT, Number(momentId));
+    playSound(soundOnNext); //sound for next page
   }
 }
-function onRenderDetails() {
-  
-}
+
 //////////////////////////////////////////////Chris's code
 function myKeyDown(event){
 	event = event || window.event;

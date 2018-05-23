@@ -1,18 +1,20 @@
+var WIDTH = window.innerWidth;
+var HEIGHT = window.innerHeight;
 var renderer, scene, camera, controls, skybox;
 var interactionObjects = {};
 var spriteDictionary = {};
-var highlighted = null;
-var lastSelected = {line: null, object: null};
-var flyTo = null, flyFrom = null;
+var highlighted = null; //current hightlighted object when mouseover
+var lastSelected = {line: null, object: null}; //last clicked object
 var isFlying = false;
-var visibleLabels = {};
-var spriteGroups = {};
-var currentTarget = null; //counter for current focused object
-var initParams = null; //Used to store parameters parsed from the URL
+var visibleLabels = {}; //Labels that are visible in camera view
+var spriteGroups = {}; //Sprites are grouped as corpus
+var currentTarget = null; // ID of current focused object
 var actionCounter = 0;
 var expectedActions = 0;
 var isPageShown = false;
 var autoRotate = true;
+var spriteJSONPath = null;
+var animation = null;
 //////////////////////////////////Chris's variables
 var moveFoward = false;
 var moveBackward = false;
@@ -34,10 +36,10 @@ init();
 function init() {
   initAudio();
   expectedActions += 1;
-  initParams = parseURL(window.location.href);
+  urlParams = parseURL(window.location.href);
   $.getJSON("gameinfo.json", function(result){
-    spriteJSONPath = result[initParams.game][initParams.dimension];
-    addGameInfo(initParams.game);
+    spriteJSONPath = result[urlParams.game][urlParams.dimension];
+    addGameInfo(urlParams.game);
     initScene();
     animate();
     actionCounter += 1;
@@ -58,9 +60,9 @@ function initScene() {
   camera = new THREE.PerspectiveCamera( 75, WIDTH / HEIGHT, 0.1, spaceScale*2.0);
   camera.position.x = 0.0;
   camera.position.y = 0.0;
-  camera.position.z = spaceScale * - 0.8  ;
+  camera.position.z = spaceScale * - 0.1  ;
 
-  if (initParams.dimension == "2"){
+  if (urlParams.dimension == "2"){
     camera.position.y = 30.0;
   }
 
@@ -73,6 +75,7 @@ function initScene() {
 
   addSkybox();
   addSprites();
+
 
   //Interactions
   window.addEventListener( 'resize', onWindowResize, false );
@@ -94,9 +97,13 @@ function initScene() {
 
 function animate() {
   loadingScene();
-  render();
   requestAnimationFrame( animate );
+  render();
   TWEEN.update();
+  // var delta = clock.getDelta();
+  // if (animation != null) {
+  //   animation.update(1000 * delta);
+  // }
   var now = performance.now();
   skybox.material.uniforms.time.value = now * 0.0005;
   //Autorotate camera
@@ -122,19 +129,36 @@ function animate() {
 function render() {
   renderer.render( scene, camera );
 }
+function loadingScene() {
+  if ((actionCounter == expectedActions) && (!isPageShown))
+  {
+    addCorporaButtons();
+    // animation = new momentAnimator(dataPool[Object.keys(spriteGroups)[0]].texture, dataPool[Object.keys(spriteGroups)[0]].UVs);
+    // animation.start(0, 100, 60);
+    cameraReady();
+    showPage();
+    isPageShown = true;
+  }
+}
 function cameraReady() {
-  if ("position" in initParams) {
-    var positions = initParams['position'];
+  if (URLKeys.POSITION in urlParams) {
+    var positions = urlParams[URLKeys.POSITION];
     if (positions.length == 3) {
       camera.position.x = positions[0];
       camera.position.y = positions[1];
       camera.position.z = positions[2];
     }
   }
-  if ("moment_id" in initParams) {
-    var inputMomentId = Number(initParams['moment_id']);
+  if (URLKeys.MOMENT in urlParams && urlParams[URLKeys.MOMENT] != "null") {
+    var inputMomentId = Number(urlParams[URLKeys.MOMENT]);
     showNearbyLabels(spriteDictionary[inputMomentId].object);
-    updateURL(inputMomentId);
+    updateURL(URLKeys.MOMENT, inputMomentId);
+  }
+  if (URLKeys.BOOKMARK in urlParams && urlParams[URLKeys.BOOKMARK] != "null") {
+    var bookmarks = urlParams[URLKeys.BOOKMARK];
+    for (var i=0; i<bookmarks.length;i++){
+      addBookmark(bookmarks[i]);
+    }
   }
 }
 

@@ -16,13 +16,13 @@ function resize(size)
   var pos =  Math.ceil(Math.log2(nSize));  //(ceiling of log n with base 2)
   return Math.pow(2, pos);
 }
-function showNearbyLabels(clickedObj, skipAnimation = false){
+function showNearbyLabels(clickedObj, animation = false){
   startingTime = performance.now();
   //controls.autoRotate = false;
   // console.log("DEBUGGING clicked:" + clickedObj.name );
   lastSelected.object = clickedObj;
-  //currentTarget = 0;
   var spriteId = Number(clickedObj.name);
+  var scale = 1.0;
   currentTarget = spriteId;
   var totalNumber = Object.keys(spriteDictionary).length;
   var start = 0;
@@ -40,18 +40,37 @@ function showNearbyLabels(clickedObj, skipAnimation = false){
   {
     if (Number(spriteDictionary[n].object.name) < start || Number(spriteDictionary[n].object.name) > stop)
     {
-      spriteDictionary[n].object.material.opacity = 0.1;
+      spriteDictionary[n].object.material.opacity = OPACITY_FOR_HIDING;
+      hideLabel(spriteDictionary[n]);
     } else {
       //Show detailed views and hide low-res views
-      _showLabel(spriteDictionary[n]);
+      if (Number(spriteDictionary[n].object.name) == spriteId) {
+        scale = 2.0;
+      } else {
+        scale = 1.0;
+      }
+      showLabel(spriteDictionary[n],scale);
     }
   }
   // console.log('DEBUGGING: Labels Generated - ' + (performance.now() - startingTime));
-  flyToTarget(clickedObj, skipAnimation);
+  flyToTarget(clickedObj, animation);
 
 }
-function _showLabel(sprite) {
-  autoRotate = false;
+function showLabel(sprite, scale=1.0) {
+  //Jump straight to target if metalabel for this sprite already exists:
+  if (sprite.labelSprite != null)
+  {
+    sprite.labelSprite.position.set(sprite.object.position.x, sprite.object.position.y, sprite.object.position.z);
+    sprite.labelSprite.scale.set(wrapper_margin*scale, canvas_height / canvas_width * wrapper_margin*scale, 1.0);
+    sprite.labelSprite.material.transparent = true;
+    sprite.labelSprite.material.opacity = 1;
+    makeVisible(sprite.labelSprite);
+    makeInvisible(sprite.object);
+    return;
+  }
+  _createLabel(sprite, scale);
+}
+function hideLabel(sprite) {
   //Jump straight to target if metalabel for this sprite already exists:
   if (sprite.labelSprite != null)
   {
@@ -59,14 +78,12 @@ function _showLabel(sprite) {
     sprite.labelSprite.scale.set(wrapper_margin, canvas_height / canvas_width * wrapper_margin, 1.0);
     sprite.labelSprite.material.transparent = true;
     sprite.labelSprite.material.opacity = 1;
-    makeVisible(sprite.labelSprite);
-    makeInvisible(sprite.object);
+    makeInvisible(sprite.labelSprite);
+    makeVisible(sprite.object);
     return;
   }
-  _createLabel(sprite);
 }
-
-function _createLabel(sprite) {
+function _createLabel(sprite, scale=1.0) {
   var imageFile =  sprite.image;
   imageLoader.load(
   	imageFile,
@@ -114,11 +131,24 @@ function _createLabel(sprite) {
       sprite.labelSprite.name = "label_" + sprite.object.name;
       sprite.labelSprite.center = canvas_anchor;
       sprite.labelSprite.position.set(sprite.object.position.x, sprite.object.position.y, sprite.object.position.z);
-      sprite.labelSprite.scale.set(1.0 * wrapper_margin, canvas_height / canvas_width * wrapper_margin, 1.0);
+      sprite.labelSprite.scale.set(scale * wrapper_margin, scale * canvas_height / canvas_width * wrapper_margin, 1.0);
       sprite.labelSprite.material.transparent = true;
       sprite.labelSprite.material.opacity = 1;
       makeVisible(sprite.labelSprite);
       scene.add(sprite.labelSprite);
       makeInvisible(sprite.object);
 	});
+}
+function showLabelsInRange(distance) {
+  getFrustrum();
+  for (var corpus in interactionObjects){
+    for (var i=0; i<interactionObjects[corpus].children.length; i++){
+      var spriteObj = interactionObjects[corpus].children[i];
+      if (isInCameraView(spriteObj) ){
+        if (distanceToCamera(spriteObj) <= distance) {
+          showLabel(spriteDictionary[Number(spriteObj.name)]);
+        }
+      }
+    }
+  }
 }
