@@ -7,24 +7,8 @@ body, html  {
     padding: 0px;
     overflow: hidden;
 }
-table {
-  border-collapse: collapse;
-}
-table, th, td {
-  border: 1px solid white;
-}
-td {
-  padding: 5px
-}
 #container {
   z-index: -1;
-}
-#layout {
-   position: absolute;
-   top: 0;
-   right: 0;
-   bottom: 0;
-   left: 0;
 }
 #corpora_bar {
   position:absolute;
@@ -34,6 +18,17 @@ td {
   height:80%;
   /*background-color: #7575a3;*/
   background: transparent;
+  z-index: 1;
+}
+#animation_bar {
+  position:absolute;
+  top: 90%;
+  left: 30%;
+  width: 40%;
+  height:5%;
+  background-color: #7575a3;
+  border-radius: 999px;
+  /*background: transparent;*/
   z-index: 1;
 }
 .left-bar {
@@ -56,17 +51,6 @@ td {
   /*background-color: transparent;*/
   background:transparent;
   z-index: 1;
-}
-#float_div {
-  position: absolute;
-  top: 8%;
-  left: 0%;
-  padding: 5px;
-  z-index: 1;
-  opacity: 0.9;
-  color: white;
-  width:25%;
-  background-color: #7575a3;
 }
 #loading-scene {
   position: absolute;
@@ -122,12 +106,26 @@ td {
   z-index: 1;
   text-align: center;
 }
+.animation-btn-wrapper {
+  position:absolute;
+  top: 20%;
+  left:19%;
+  width: 8%;
+  height:60%;
+  z-index: 1;
+  text-align: center;
+}
 #corpora-btn {
   width: 100%;
   height: 100%;
   left: 0%;
 }
 #bookmark-btn {
+  width: 100%;
+  height: 100%;
+  left: 0%;
+}
+#animation-btn {
   width: 100%;
   height: 100%;
   left: 0%;
@@ -214,13 +212,12 @@ td {
 .search-container {
   position:absolute;
   top: 25%;
-  left: 70%;
+  left: 80%;
   width: 15%;
   height:50%;
   z-index: 1;
   text-align: center;
 }
-
 .search-container button {
   position:absolute;
   float: left;
@@ -292,4 +289,96 @@ td {
 #question-helper {
   font-size: 2.5vw;
   color: white;
+}
+#startId {
+  position:absolute;
+  height:70%;
+  top:15%;
+  font-size: 0.9vw;
+  color: #7575a3;
+  width:15%;
+  left:5%;
+  border: none;
+  text-align: center;
+  border-radius: 999px;
+}
+#stopId {
+  position:absolute;
+  height:70%;
+  top:15%;
+  font-size: 0.9vw;
+  color: #7575a3;
+  width:15%;
+  left:25%;
+  border: none;
+  text-align: center;
+  border-radius: 999px;
+}
+#separator {
+  position:absolute;
+  height:100%;
+  font-size: 2vw;
+  left:17%;
+  color:white;
+}
+#player_controls {
+  position:absolute;
+  height:80%;
+  top:10%;
+  color: white;
+  width:50%;
+  left:45%;
+  border: none;
+  text-align: center;
+}
+#fastRwd, #play, #pause, #fastFwd, #replay, #loop{
+  font-size: 2vw;
+}
+.control-button {
+  position:absolute;
+  top:0%;
+  height:100%;
+  border: 0px;
+  background: transparent;
+  color: white;
+  padding: 1px 1px;
+  cursor: pointer;
+  z-index: 1;
+  text-align: center;
+}
+#fastrwd-btn {
+  left:0%;
+  width:20%;
+  top:0%;
+  height:100%;
+}
+#play-btn {
+  left:20%;
+  width:20%;
+  top:0%;
+  height:100%;
+}
+#pause-btn {
+  left:20%;
+  width:20%;
+  top:0%;
+  height:100%;
+}
+#fastfwd-btn {
+  left:40%;
+  width:20%;
+  top:0%;
+  height:100%;
+}
+#replay-btn {
+  left:60%;
+  width:20%;
+  top:0%;
+  height:100%;
+}
+#loop-btn {
+  left:80%;
+  width:20%;
+  top:0%;
+  height:100%;
 }

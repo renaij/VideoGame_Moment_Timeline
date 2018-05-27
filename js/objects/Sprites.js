@@ -14,7 +14,7 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
   var spriteSheetPath = jsonObj.spriteSheetPath;
   expectedActions += 1;
   var totalMap = textureLoader.load(spriteSheetPath, function() {
-    dataPool[corpusName]['texture'] = totalMap.clone();  
+    dataPool[corpusName]['texture'] = totalMap.clone();
     actionCounter += 1;
   });
   dataPool[corpusName]['UVs'] = {};
@@ -28,7 +28,7 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
     for (var i = 0; i < float32View.length; i = i + dimensions) {
       var temp = []
       for (var j = 0; j < dimensions; j++) {
-        temp[j] = float32View[i+j] * scaleMultiplier;
+        temp[j] = float32View[i+j] * SCALE_MULTIPLIER;
       }
       positionArray.push(temp);
     }
@@ -66,10 +66,10 @@ var addSpritesToScene = function(corpusName, numberBase, dataObj){
       spriteDictionary[totalIndex] = {
         object: sprite,
         image:  basePath + '/' + screenshotsFolder + '/' + jsonObj.spritesheet[i].filename,
-        label: 'Moment Index: ' + i.toString() + ' / ' + (number-1).toString(),
+        //label: 'Moment Index: ' + i.toString() + ' / ' + (number-1).toString(),
         game: game,
         corpus: corpusName,
-        labelSprite: null //reserved for metalabel shown when this sprite is clicked
+        momentIndex: i, //moment Id in this corpus, different from globalId (totalIndex)
       };
     } // for i in position
     //Add groups for raycasting

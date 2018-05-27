@@ -13,7 +13,7 @@ var addSkybox = function(){
   material.depthWrite = false;
   material.side = THREE.BackSide;
 
-  var geometry = new THREE.SphereBufferGeometry(spaceScale );
+  var geometry = new THREE.SphereBufferGeometry(SPACE_SCALE );
   skybox = new THREE.Mesh( geometry, material );
   scene.add( skybox );
 }

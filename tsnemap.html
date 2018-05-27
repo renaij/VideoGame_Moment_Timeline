@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="css/UI.css" type="text/css">
-		<!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"-->
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 		<style>
 		</style>
@@ -28,6 +28,9 @@
 			<div class="bookmark-btn-wrapper">
 				<button class="button" id="bookmark-btn" onclick="onShowBookmarkBar(this.id)">Bookmark</button>
 			</div>
+			<div class="animation-btn-wrapper">
+				<button class="button" id="animation-btn" onclick="onShowAnimationBar(this.id)">Animation</button>
+			</div>
 			<div class="search-container">
 				<div class="search-wrapper">
 					<input type="text" placeholder="Search By Id..." id="moment_id" name="search">
@@ -41,6 +44,18 @@
 			</div-->
 		</div>
 		<div id="corpora_bar" style="display:none"></div>
+		<div id="animation_bar" style="display:none">
+			<input type="text" placeholder="StartId" id="startId" name="input_start">
+			<input type="text" placeholder="StopId" id="stopId" name="input_stop">
+			<div id="player_controls">
+				<button type="submit" class="control-button" id="fastrwd-btn" onclick="onPlay(this.id)"><i class="material-icons" id="fastRwd">fast_rewind</i></button>
+				<button type="submit" class="control-button" id="play-btn" onclick="onPlay(this.id)"><i class="material-icons" id="play">play_circle_outline</i></button>
+				<button type="submit" class="control-button" id="pause-btn" onclick="onPlay(this.id)"><i class="material-icons" id="pause" style="display:none">pause_circle_outline</i></button>
+				<button type="submit" class="control-button" id="fastfwd-btn" onclick="onPlay(this.id)"><i class="material-icons" id="fastFwd">fast_forward</i></button>
+				<button type="submit" class="control-button" id="replay-btn" onclick="onPlay(this.id)"><i class="material-icons" id="replay">replay</i></button>
+				<button type="submit" class="control-button" id="loop-btn" onclick="onPlay(this.id)"><i class="material-icons" id="loop">loop</i></button>
+			</div>
+		</div>
 		<div id="bottomright-bar" style="display:none;">
 			<p id="game-info"></p>
 		</div>

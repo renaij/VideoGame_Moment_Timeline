@@ -17,7 +17,7 @@ var cameraViewProjectionMatrix = new THREE.Matrix4();
 var _showTarget = function(target){
   getFrustrum();
   var isInCamera = false;
-  var delta = 0.5;
+  var delta = 1.0;
   var targetDistance = distanceToCamera(target);
   // frustum is now ready to check all the objects you need
   for (var key in visibleLabels)
@@ -25,6 +25,7 @@ var _showTarget = function(target){
     var distance = 0;
     isInCamera = frustum.intersectsSprite( visibleLabels[key])
     distance = distanceToCamera(visibleLabels[key]);
+    // console.log("key=" + key + ",distance=" + distance);
     //If an object is in front of the target, make it invisible
     if (isInCamera && (distance <= targetDistance + delta )){
       makeInvisible(visibleLabels[key]);
@@ -34,16 +35,19 @@ var _showTarget = function(target){
 }
 var makeVisible = function(obj){
   obj.visible = true;
-  visibleLabels[obj.name] = obj;
+  visibleLabels[obj.id] = obj;
 }
 var makeInvisible = function(obj){
   obj.visible = false;
-  delete visibleLabels[obj.name];
+  delete visibleLabels[obj.id];
 }
 //Move the camera to target by flying over
 var flyToTarget = function(targetObj, animation = false){
-  var targetId = Number(targetObj.name);
-  startingTime = performance.now();
+  if (targetObj == null || targetObj == undefined)
+  {
+    return;
+  }
+  //startingTime = performance.now();
   //Moving forward to the target object
   direction = raycaster.ray.direction.clone().normalize();
   direction.multiplyScalar(FLY_STOP_DISTANCE);
@@ -55,18 +59,14 @@ var flyToTarget = function(targetObj, animation = false){
   isFlying = true;
   lookAtOrg = controls.target.clone();
   lookAtDest = targetObj.position;
-  duration = flyingDuration;
+  duration = FLYING_DURATION;
   //If animation is false, skip animation and jump to the target;
   //Else fly to the target
-  if (animation) {
+  if (!animation) {
     isFlying = false;
     controls.target = lookAtDest;
     camera.lookAt(targetObj.position);
-    if (spriteDictionary[targetId].labelSprite != null)
-    {
-      _jumpToTarget(spriteDictionary[targetId].labelSprite);
-      updateURL(targetId);
-    }
+    _jumpToTarget(targetObj);
     return;
   }
   // console.log('DEBUGGING: Flying Started - ' + (performance.now() - startingTime)); startingTime = performance.now();
@@ -92,11 +92,7 @@ var flyToTarget = function(targetObj, animation = false){
     .onComplete(function () {
       isFlying = false;
       // console.log('DEBUGGING: Flying Finished - ' + (performance.now() - startingTime)); startingTime = performance.now();
-      if (spriteDictionary[targetId].labelSprite != null)
-      {
-        _jumpToTarget(spriteDictionary[targetId].labelSprite);
-        updateURL(targetId);
-      }
+      _jumpToTarget(targetObj);
       //showLabelsInRange(DISTANCE_FOR_DETAILED_VIEW);
     });
     tween_rotate.chain(tween_forward);

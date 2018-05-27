@@ -15,7 +15,12 @@ function _getUrlString(params) {
   // only process recognized keys
   if (URLKeys.GAME in params) { stringParams[URLKeys.GAME] = params[URLKeys.GAME]; };
   if (URLKeys.CORPORA in params && params[URLKeys.CORPORA] != null) {
-    stringParams[URLKeys.CORPORA] = params[URLKeys.CORPORA].join(',');
+    if (params[URLKeys.CORPORA].length > 1) {
+      stringParams[URLKeys.CORPORA] = params[URLKeys.CORPORA].join(',');
+    } else {
+      stringParams[URLKeys.CORPORA] = params[URLKeys.CORPORA];
+    }
+
   }
   else {
     urlParams[URLKeys.CORPORA] = null;
@@ -26,7 +31,11 @@ function _getUrlString(params) {
     stringParams[URLKeys.POSITION] = params[URLKeys.POSITION].join(',');
   };
   if (URLKeys.BOOKMARK in params) {
-    stringParams[URLKeys.BOOKMARK] = params[URLKeys.BOOKMARK].join(',');
+    if (params[URLKeys.BOOKMARK].length > 1) {
+      stringParams[URLKeys.BOOKMARK] = params[URLKeys.BOOKMARK].join(',');
+    } else {
+      stringParams[URLKeys.BOOKMARK] = params[URLKeys.BOOKMARK];
+    }
   };
   for (key in stringParams) {
     urlString += key + "=" + stringParams[key] + ';'
@@ -80,7 +89,7 @@ function parseURL(url) {
       if (itemArr[1].indexOf(',') != -1) {
         params[itemArr[0]] = itemArr[1].split(',');
       } else {
-        params[itemArr[0]] = itemArr[1];
+        params[itemArr[0]] = [itemArr[1]];
       }
     }
   }

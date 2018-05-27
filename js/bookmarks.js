@@ -4,7 +4,7 @@ var numberOfPages=0;
 var currentPage=0;
 
 function addBookmark(momentId) {
-  if (!bookmarks.hasOwnProperty(momentId)){
+  if (!bookmarksDict.hasOwnProperty(momentId)){
     numberOfPages += 1;
     currentPage = numberOfPages - 1;
     bookmarksDict[momentId] = numberOfPages-1;
@@ -37,16 +37,17 @@ function getNextBookmark() {
   return momentId;
 }
 function showBookmarkLabels() {
+  if (bookmarkList.length == 0){
+    return;
+  }
+  currentTarget = bookmarkList[0];
   for (var i=0; i<bookmarkList.length;i++){
-    showLabel(spriteDictionary[bookmarkList[i]], 2.0);
-    if (i == 0 ){
-      flyToTarget(spriteDictionary[bookmarkList[i]].object);
-    }
+    showLabel(bookmarkList[i]);
   }
 }
 function hideBookmarkLabels() {
   for (var key in bookmarksDict){
-    hideLabel(spriteDictionary[key]);
+    hideLabel(key);
   }
 }
 function getBookmarks() {

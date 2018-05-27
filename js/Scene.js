@@ -3,6 +3,7 @@ var HEIGHT = window.innerHeight;
 var renderer, scene, camera, controls, skybox;
 var interactionObjects = {};
 var spriteDictionary = {};
+var metalabelDictionary = {};
 var highlighted = null; //current hightlighted object when mouseover
 var lastSelected = {line: null, object: null}; //last clicked object
 var isFlying = false;
@@ -44,9 +45,7 @@ function init() {
     animate();
     actionCounter += 1;
   });
-
 }
-
 function initScene() {
   renderer = new THREE.WebGLRenderer();
   renderer.setPixelRatio( window.devicePixelRatio );
@@ -57,10 +56,10 @@ function initScene() {
 
   scene = new THREE.Scene();
   // scene.fog = new THREE.FogExp2( 0x000000, 0.0009 );
-  camera = new THREE.PerspectiveCamera( 75, WIDTH / HEIGHT, 0.1, spaceScale*2.0);
+  camera = new THREE.PerspectiveCamera( 75, WIDTH / HEIGHT, 0.1, SPACE_SCALE*2.0);
   camera.position.x = 0.0;
   camera.position.y = 0.0;
-  camera.position.z = spaceScale * - 0.1  ;
+  camera.position.z = SPACE_SCALE * - 0.1  ;
 
   if (urlParams.dimension == "2"){
     camera.position.y = 30.0;
@@ -68,9 +67,7 @@ function initScene() {
 
   controls = new THREE.OrbitControls( camera, renderer.domElement);
   controls.enableKeys = true;
-  //controls.autoRotate = true;
-  //controls.autoRotateSpeed = autoRotateSpeed;
-  controls.maxDistance = spaceScale * 0.8;
+  controls.maxDistance = SPACE_SCALE * 0.8;
   controls.update();
 
   addSkybox();
@@ -110,11 +107,11 @@ function animate() {
   if (autoRotate)
   {
     //controls.update();
-    camera.rotation.x += 0.00001*90 * Math.PI / 180;
-    camera.rotation.z += 0.00001*90 * Math.PI / 180;
+    camera.rotation.x += AUTO_ROTATE_SPEED * 90 * Math.PI / 180;
+    camera.rotation.z += AUTO_ROTATE_SPEED * 90 * Math.PI / 180;
   }
 
-  ///////////////////////////////////////Chris's code
+  //////////////////////////Chris's code: Navigation////////////////////////////
   var delta = (now - prevTime)/1000;
   velocity.z -= velocity.z * 10.0 * delta;
   direction.z = Number( moveFoward ) - Number (moveBackward);
@@ -122,7 +119,7 @@ function animate() {
   if(moveFoward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
   camera.translateZ( velocity.z * delta );//for moving forward and backward
   turning();
-  ////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   prevTime = now;
   camera.updateProjectionMatrix();
 }
@@ -133,8 +130,8 @@ function loadingScene() {
   if ((actionCounter == expectedActions) && (!isPageShown))
   {
     addCorporaButtons();
-    // animation = new momentAnimator(dataPool[Object.keys(spriteGroups)[0]].texture, dataPool[Object.keys(spriteGroups)[0]].UVs);
-    // animation.start(0, 100, 60);
+    //animation = new momentAnimator(dataPool[Object.keys(spriteGroups)[0]].texture, dataPool[Object.keys(spriteGroups)[0]].UVs);
+    //animation.start(0, 100, 60);
     cameraReady();
     showPage();
     isPageShown = true;
@@ -151,7 +148,7 @@ function cameraReady() {
   }
   if (URLKeys.MOMENT in urlParams && urlParams[URLKeys.MOMENT] != "null") {
     var inputMomentId = Number(urlParams[URLKeys.MOMENT]);
-    showNearbyLabels(spriteDictionary[inputMomentId].object);
+    showNearbyLabels(inputMomentId, 1.0, true);
     updateURL(URLKeys.MOMENT, inputMomentId);
   }
   if (URLKeys.BOOKMARK in urlParams && urlParams[URLKeys.BOOKMARK] != "null") {
