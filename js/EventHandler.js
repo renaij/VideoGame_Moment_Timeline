@@ -1,4 +1,5 @@
 var lastClickedTime = null;
+var highlighted = null; //current hightlighted object when mouseover
 
 var input = document.getElementById("moment_id");
 // Execute a function when the user releases a key on the keyboard
@@ -19,7 +20,7 @@ function onMouseDown(event) {
 }
 function onMouseUp(event) {
   //event.preventDefault();
-  if (!isFlying) {
+  if (!g_isFlying) {
     //if it's a drag, do nothing;
     if (performance.now() - lastClickedTime > 200)
     {
@@ -31,30 +32,31 @@ function onMouseUp(event) {
 
     //var startingTime = performance.now();
     raycaster.setFromCamera( mouse, camera );
-    var intersects = raycaster.intersectObjects( Object.values(interactionObjects), true );
+    var intersects = raycaster.intersectObjects( Object.values(spriteManager.interactionObjects), true );
     //console.log('DEBUGGING: Ray Cast - ' + (performance.now() - startingTime)); startingTime = performance.now();
-    resetMetaLabel();
+    resetVisibleLabels();
     resetSprites();
     // console.log('DEBUGGING: Resets   - ' + (performance.now() - startingTime));
     // if there is one (or more) intersections
   	if ( intersects.length > 0 )
   	{
-      autoRotate = false;
+      g_autoRotate = false;
 	    ///////////////////////////////////////////////////Chris's Code
-      playSound(soundOnClick); //Sound for Clicking
+      audioManager.playSound(audioManager.soundOnClick); //Sound for Clicking
 	    ////////////////////////////////////////////////
       var intersectedObj = intersects[0].object;
-      showNearbyLabels(Number(intersectedObj.name), true);
-      updateURL(URLKeys.MOMENT, currentTarget);
+      labelManager.showNearbyLabels(Number(intersectedObj.name), ADJACENT_MOMENTS, true);
+      urlManager.updateURL(URLKeys.MOMENT, g_currentTarget);
+      g_lastSelected.object = spriteManager.spriteDictionary[g_currentTarget].object;
   	} else {
-      //controls.autoRotate = true;
-      currentTarget = null;
-      lastSelected.object = null;
-      autoRotate = true;
-      updateURL(URLKeys.MOMENT, null);
+      //controls.g_autoRotate = true;
+      g_currentTarget = null;
+      g_lastSelected.object = null;
+      g_autoRotate = true;
+      urlManager.updateURL(URLKeys.MOMENT, null);
       //console.log('Nothing got clicked');
     } //end of intersect.length > 0
-  } // end of isFlying
+  } // end of g_isFlying
 }
 
 function onMouseMove(event) {
@@ -63,13 +65,10 @@ function onMouseMove(event) {
   mouse.x = ( event.clientX / window.innerWidth ) * 2.0 - 1.0;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2.0 + 1.0;
   raycaster.setFromCamera( mouse, camera );
-  var intersects = raycaster.intersectObjects( Object.values(interactionObjects), true );
+  var intersects = raycaster.intersectObjects( Object.values(spriteManager.interactionObjects), true );
   // if there is one (or more) intersections
   if ( intersects.length > 0 )
   {
-	  ////////////////////////////////////////////////////////////Chris's Code
-    //playSound(soundOnSelect); //sound for selecting
-	  ///////////////////////////////////////////////////
     resetHightLight();
     highlighted = intersects[0].object;
     highlighted.material.color.setHex( 0x10ffff );
@@ -89,67 +88,65 @@ function resetHightLight() {
   }
 }
 function resetSprites(){
-  for (var corpusname in spriteGroups)
+  for (var corpusname in spriteManager.spriteGroups)
   {
     resetSpritesInCorpus(corpusname);
   }
 }
 function resetSpritesInCorpus(corpus){
   //if (document.getElementById(corpus + "_check").checked){
-  if (corpus in interactionObjects){
-    for (var i = 0; i < spriteGroups[corpus].children.length; i++)
+  if (corpus in spriteManager.interactionObjects){
+    for (var i = 0; i < spriteManager.spriteGroups[corpus].children.length; i++)
     {
-      spriteGroups[corpus].children[i].material.opacity = 1.0;
-      spriteGroups[corpus].children[i].visible = true;
+      spriteManager.spriteGroups[corpus].children[i].material.opacity = 1.0;
+      spriteManager.spriteGroups[corpus].children[i].visible = true;
     }
   }
 }
-function resetMetaLabel(){
-  for (var key in visibleLabels){
-    makeInvisible(visibleLabels[key]);
-  }
+function resetVisibleLabels(){
+  cameraManager.clearVisibleLabels();
 }
 function resetLines(){
-  if (lastSelected.line != null)
+  if (g_lastSelected.line != null)
   {
-    scene.remove(lastSelected.line) ;
-    lastSelected.line = null;
+    scene.remove(g_lastSelected.line) ;
+    g_lastSelected.line = null;
   }
 }
 function resetBookmakrs() {
   for (bookmark in bookmarkList) {
-    
+
   }
 }
 
 function onKeydown(event){
   // should check if selected item is part of some object
-  if (lastSelected.object != null && (event.key == '.' || event.key == '>')){
-    if (currentTarget >= Object.keys(spriteDictionary).length - 1)
+  if (g_lastSelected.object != null && (event.key == '.' || event.key == '>')){
+    if (g_currentTarget >= Object.keys(spriteManager.spriteDictionary).length - 1)
     {
       return;
     }
-    autoRotate = false;
+    g_autoRotate = false;
     ////////////////////////////////////////////////////////////Chris's Code
-    playSound(soundOnNext); //sound for next page
+    audioManager.playSound(audioManager.soundOnNext); //sound for next page
   	//////////////////////////////////////////////////////////////////////
-    currentTarget += 1;
-    showNearbyLabels(currentTarget);
-    updateURL(URLKeys.MOMENT, currentTarget);
-
-  } else if (lastSelected.object!= null && (event.key == ',' || event.key == '<')){
-    if (currentTarget == 0)
+    g_currentTarget += 1;
+    labelManager.showNearbyLabels(g_currentTarget, 5, false);
+    urlManager.updateURL(URLKeys.MOMENT, g_currentTarget);
+    g_lastSelected.object = spriteManager.spriteDictionary[g_currentTarget].object;
+  } else if (g_lastSelected.object!= null && (event.key == ',' || event.key == '<')){
+    if (g_currentTarget == 0)
     {
       return;
     }
-    autoRotate = false;
+    g_autoRotate = false;
     ////////////////////////////////////////////////////////////Chris's Code
-    playSound(soundOnNext); //sound for next page
+    audioManager.playSound(audioManager.soundOnNext); //sound for next page
 	  ////////////////////////////////////////////////////////////Chris's Code
-    currentTarget -= 1;
-    showNearbyLabels(currentTarget);
-    updateURL(URLKeys.MOMENT, currentTarget);
-
+    g_currentTarget -= 1;
+    labelManager.showNearbyLabels(g_currentTarget, 5, false);
+    urlManager.updateURL(URLKeys.MOMENT, g_currentTarget);
+    g_lastSelected.object = spriteManager.spriteDictionary[g_currentTarget].object;
   }
 }
 function onKeyup(event){
@@ -161,34 +158,38 @@ function onMomentInput(event) {
   var inputMomentId = document.getElementById("moment_id");
   inputMomentId.blur();
   var momentId = Number(inputMomentId.value);
-  autoRotate = false;
-  resetMetaLabel();
+  g_autoRotate = false;
+  resetVisibleLabels();
   resetSprites();
-  showNearbyLabels(momentId, true);
-  updateURL(URLKeys.MOMENT, momentId);
-  playSound(soundOnClick);//Sound for Clicking
+  g_currentTarget = momentId;
+  labelManager.showNearbyLabels(momentId, ADJACENT_MOMENTS, true);
+  urlManager.updateURL(URLKeys.MOMENT, momentId);
+  audioManager.playSound(audioManager.soundOnClick);//Sound for Clicking
+  g_lastSelected.object = spriteManager.spriteDictionary[g_currentTarget].object;
 }
 
 //Save a new bookmark
 function onBookmarking(event) {
-  if (lastSelected.object != null && (event.key == 'b')){
-    addBookmark(Number(lastSelected.object.name));
-    updateURL(URLKeys.BOOKMARK, getBookmarks());
+  if (g_lastSelected.object != null && (event.key == 'b')){
+    bookmarkManager.addBookmark(Number(g_lastSelected.object.name));
+    urlManager.updateURL(URLKeys.BOOKMARK, bookmarkManager.getBookmarks());
   }
 }
 //Retrieve moment by bookmark
 function onReadBookmark(event) {
   if (event.key == '_' || event.key == '-' ){
-    var momentId = getLastBookmark();
+    var momentId = bookmarkManager.getLastBookmark();
   }
   else if (event.key == '+' || event.key == '=' ){
-    var momentId = getNextBookmark();
+    var momentId = bookmarkManager.getNextBookmark();
   }
   if (momentId != null){
-    autoRotate = false;
-    showNearbyLabels(Number(momentId));
-    updateURL(URLKeys.MOMENT, Number(momentId));
-    playSound(soundOnNext); //sound for next page
+    g_autoRotate = false;
+    g_currentTarget = Number(momentId);
+    labelManager.showNearbyLabels(g_currentTarget, ADJACENT_MOMENTS);
+    urlManager.updateURL(URLKeys.MOMENT, g_currentTarget);
+    audioManager.playSound(audioManager.soundOnNext); //sound for next page
+    g_lastSelected.object = spriteManager.spriteDictionary[g_currentTarget].object;
   }
 }
 

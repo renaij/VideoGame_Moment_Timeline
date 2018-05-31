@@ -1,22 +1,26 @@
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
-var renderer, scene, camera, controls, skybox;
-var interactionObjects = {};
-var spriteDictionary = {};
-var metalabelDictionary = {};
-var highlighted = null; //current hightlighted object when mouseover
-var lastSelected = {line: null, object: null}; //last clicked object
-var isFlying = false;
-var visibleLabels = {}; //Labels that are visible in camera view
-var spriteGroups = {}; //Sprites are grouped as corpus
-var currentTarget = null; // ID of current focused object
-var actionCounter = 0;
-var expectedActions = 0;
+var renderer, scene, camera, controls;
 var isPageShown = false;
-var autoRotate = true;
 var spriteJSONPath = null;
-var animation = null;
-//////////////////////////////////Chris's variables
+/////////////////////globals////////////////////////////////////////////////////
+var g_lastSelected = {line: null, object: null}; //last clicked object
+var g_isFlying = false;
+var g_currentTarget = null; // ID of current focused object
+var g_actionCounter = 0;
+var g_expectedActions = 0;
+var g_autoRotate = true;
+////////////////////Objects/////////////////////////////////////////////////////
+var animator = null;
+var bookmarkManager = new BookmarkManager();
+var spriteManager = new SpriteManager();
+var labelManager = new MetalabelManager();
+var skybox = new Skybox();
+var cameraManager = new CameraManager();
+var urlManager = new UrlManager();
+var audioManager = new AudioManager();
+var eventQueue = new EventQueue();
+///////////////////Chris's variables////////////////////////////////////////////
 var moveFoward = false;
 var moveBackward = false;
 var turnLeft = false;
@@ -29,21 +33,20 @@ var direction = new THREE.Vector3();
 var rotationVector = new THREE.Vector3( 0, 0, 0 );
 var tmpQuaternion = new THREE.Quaternion();
 var clock = new THREE.Clock();//variables for turning direction and moving speed
+///////////////////////////////////////////////////////////////////////////////
 
-
-////////////////////////////////////
 init();
 
 function init() {
-  initAudio();
-  expectedActions += 1;
-  urlParams = parseURL(window.location.href);
+  audioManager.initAudio();
+  g_expectedActions += 1;
+  urlParams = urlManager.parseURL(window.location.href);
   $.getJSON("gameinfo.json", function(result){
     spriteJSONPath = result[urlParams.game][urlParams.dimension];
     addGameInfo(urlParams.game);
     initScene();
     animate();
-    actionCounter += 1;
+    g_actionCounter += 1;
   });
 }
 function initScene() {
@@ -70,9 +73,8 @@ function initScene() {
   controls.maxDistance = SPACE_SCALE * 0.8;
   controls.update();
 
-  addSkybox();
-  addSprites();
-
+  skybox.addToScene(scene);
+  spriteManager.addSprites(scene, spriteJSONPath);
 
   //Interactions
   window.addEventListener( 'resize', onWindowResize, false );
@@ -96,15 +98,16 @@ function animate() {
   loadingScene();
   requestAnimationFrame( animate );
   render();
+  eventQueue.update();
   TWEEN.update();
   // var delta = clock.getDelta();
-  // if (animation != null) {
-  //   animation.update(1000 * delta);
+  // if (animator != null) {
+  //   animator.update(1000 * delta);
   // }
   var now = performance.now();
-  skybox.material.uniforms.time.value = now * 0.0005;
+  skybox.uniforms.time.value = now * 0.0005;
   //Autorotate camera
-  if (autoRotate)
+  if (g_autoRotate)
   {
     //controls.update();
     camera.rotation.x += AUTO_ROTATE_SPEED * 90 * Math.PI / 180;
@@ -127,11 +130,9 @@ function render() {
   renderer.render( scene, camera );
 }
 function loadingScene() {
-  if ((actionCounter == expectedActions) && (!isPageShown))
+  if ((g_actionCounter == g_expectedActions) && (!isPageShown))
   {
     addCorporaButtons();
-    //animation = new momentAnimator(dataPool[Object.keys(spriteGroups)[0]].texture, dataPool[Object.keys(spriteGroups)[0]].UVs);
-    //animation.start(0, 100, 60);
     cameraReady();
     showPage();
     isPageShown = true;
@@ -148,13 +149,13 @@ function cameraReady() {
   }
   if (URLKeys.MOMENT in urlParams && urlParams[URLKeys.MOMENT] != "null") {
     var inputMomentId = Number(urlParams[URLKeys.MOMENT]);
-    showNearbyLabels(inputMomentId, 1.0, true);
-    updateURL(URLKeys.MOMENT, inputMomentId);
+    labelManager.showNearbyLabels(inputMomentId, 1, true);
+    urlManager.updateURL(URLKeys.MOMENT, inputMomentId);
   }
   if (URLKeys.BOOKMARK in urlParams && urlParams[URLKeys.BOOKMARK] != "null") {
-    var bookmarks = urlParams[URLKeys.BOOKMARK];
-    for (var i=0; i<bookmarks.length;i++){
-      addBookmark(bookmarks[i]);
+    var bmlist = urlParams[URLKeys.BOOKMARK];
+    for (var i=0; i<bmlist.length;i++){
+      bookmarkManager.addBookmark(bmlist[i]);
     }
   }
 }

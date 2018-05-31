@@ -352,13 +352,7 @@ body, html  {
   top:0%;
   height:100%;
 }
-#play-btn {
-  left:20%;
-  width:20%;
-  top:0%;
-  height:100%;
-}
-#pause-btn {
+#playpause-btn {
   left:20%;
   width:20%;
   top:0%;

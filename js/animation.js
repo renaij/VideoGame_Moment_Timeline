@@ -1,5 +1,5 @@
 
-function momentAnimator(texture, UVs)
+function MomentAnimator(texture, UVs)
 {
   //texture is passed in by reference
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;

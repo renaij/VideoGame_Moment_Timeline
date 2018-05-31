@@ -11,7 +11,7 @@ function addGameInfo(game) {
 }
 function addCorporaButtons(){
   var idx = 0;
-  for (corpus in spriteGroups){
+  for (corpus in spriteManager.spriteGroups){
     var id = corpus + "-btn";
     var wrapper = id + "-wrapper";
     $('#corpora_bar').prepend("<div id='" + wrapper + "'></div>");
@@ -46,11 +46,13 @@ function onShowBookmarkBar(id){
   var isBkmkBtnClicked = $('#' + id).hasClass("button-clicked");
   if (isBkmkBtnClicked) {
     $('#bookmark-btn').switchClass('button-clicked', 'button','fast');
-    hideBookmarkLabels();
+    bookmarkManager.hideBookmarkLabels();
+    //Add time div
   } else {
     $('#bookmark-btn').switchClass('button', 'button-clicked','fast');
     //Show bookmarks
-    showBookmarkLabels();
+    bookmarkManager.showBookmarkLabels();
+    //Hide time div
   }
 }
 function onShowCorpus(id){
@@ -59,13 +61,13 @@ function onShowCorpus(id){
   if ( isCorpusBtnClicked ) {
     $('#' + id).switchClass('button-sm-clicked', 'button-sm','fast');
     //Hide corpus
-    toggleSpriteGroup(group, false);
-    toggleGroupRaycasting(group,false);
+    spriteManager.toggleSpriteGroup(group, false);
+    spriteManager.toggleGroupRaycasting(group,false);
   } else {
     $('#' + id).switchClass('button-sm', 'button-sm-clicked','fast');
     //Show corpus
-    toggleSpriteGroup(group, true);
-    toggleGroupRaycasting(group,true);
+    spriteManager.toggleSpriteGroup(group, true);
+    spriteManager.toggleGroupRaycasting(group,true);
   }
 }
 function onShowAnimationBar(id) {
@@ -116,7 +118,28 @@ function dragElement(elmnt) {
 }
 
 function onPlay(id) {
-  if (id == "play-btn") {
+  if (id == "playpause-btn") {
+    startId = Number(document.getElementById('startId').value);
+    stopId = Number(document.getElementById('stopId').value);
+    element = document.getElementById('playpause');
+    if ( element.innerText == "play_circle_outline") {
+      element.innerText = "pause_circle_outline";
+      //pause animation
+      animationPlaying = false;
+    } else {
+      element.innerText = "play_circle_outline";
+      //play animation
+      animationPlaying = true;
+    }
+  }
+}
 
+function animation(startId, stopId) {
+  autoRotate = false;
+  for (var i = startId; i <= stopId; i++) {
+    if (animationPlaying) {
+      labelManager.showNearbyLabels(i, 0);
+      urlManager.updateURL(URLKeys.MOMENT, i);
+    }
   }
 }
