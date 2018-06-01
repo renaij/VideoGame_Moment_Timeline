@@ -1,3 +1,6 @@
+	var timelineData = [
+	{"value": 0, "name": "Start", radius: "7"},
+	{"value": 4500, "name": "End", radius: "7"}];
 function showPage() {
   $("#loading-scene").fadeOut(1000);
   document.getElementById("container").style.display = "block";
@@ -142,4 +145,28 @@ function animation(startId, stopId) {
       urlManager.updateURL(URLKeys.MOMENT, i);
     }
   }
+}
+
+function createTimeline(){
+	console.log(spriteManager.spriteGroups.human);
+	TimeKnots.draw("#timelineNonDate", timelineData, {dateDimension:false, color: "#7575a3", width:1300, showLabels: true, labelFormat: "%Y",lineWidth:2});
+}
+function addTimeline(momentId){
+	console.log("added");
+	timelineData.push({"value": spriteManager.spriteDictionary[momentId].momentIndex, "name": spriteManager.spriteDictionary[momentId].game + " " + spriteManager.spriteDictionary[momentId].corpus, img: spriteManager.spriteDictionary[momentId].image,radius: "7"});
+	var elem = document.getElementById("timelineNonDate");
+	elem.innerHTML = "";
+	var timeline = TimeKnots.draw("#timelineNonDate", timelineData, {dateDimension:false, color: "#7575a3", width:1300, showLabels: true, labelFormat: "%Y",lineWidth:2});
+}
+
+function deleteTimeline(selectedObject){
+	console.log("deleted");
+	var name = Number(selectedObject.name);
+	var imglink = spriteManager.spriteDictionary[name].image;
+	timelineData = timelineData.filter(function(object) {
+		return object.img !== imglink;
+	});
+	var elem = document.getElementById("timelineNonDate");
+	elem.innerHTML = "";
+	var timeline = TimeKnots.draw("#timelineNonDate", timelineData, {dateDimension:false, color: "#7575a3", width:1300, showLabels: true, labelFormat: "%Y",lineWidth:2});
 }

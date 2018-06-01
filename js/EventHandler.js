@@ -216,6 +216,10 @@ function myKeyDown(event){
 			turnDown = 1;
 			break;
 	}
+	if(event.keyCode == 8){
+		//console.log(lastSelected.object.name);
+		deleteTimeline(g_lastSelected.object);
+	}
 	updateRotation();
 };
 
@@ -249,4 +253,10 @@ function updateRotation(){
 	rotationVector.y = ( - turnRight + turnLeft );
 	//update the rotation's direction
 };
+
+function resizeTimeline(){
+	var elem = document.getElementById("timelineNonDate");
+	elem.innerHTML = "";
+	TimeKnots.draw("#timelineNonDate", timelineData, {dateDimension:false, color: "#7575a3", width:window.innerWidth/1.1815, showLabels: true, labelFormat: "%Y",lineWidth:2});
+}
 ////////////////////////////////////////////////////

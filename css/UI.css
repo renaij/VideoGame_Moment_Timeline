@@ -376,3 +376,12 @@ body, html  {
   top:0%;
   height:100%;
 }
+
+.timeline {
+  position:absolute;
+  left: 10%;
+  width: 90%;
+  bottom: 0%;
+  z-index: 1;
+  resize: both;
+}

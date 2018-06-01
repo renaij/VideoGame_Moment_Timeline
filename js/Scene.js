@@ -91,7 +91,9 @@ function initScene() {
   //////////////////////////////////////////////////chris's code
   window.addEventListener( 'keyup', myKeyUp, false );
   window.addEventListener( 'keydown', myKeyDown, false );
+  window.addEventListener('resize', resizeTimeline, false );
   ///////////////////////////////////////////////////////
+   createTimeline();
 }
 
 function animate() {
